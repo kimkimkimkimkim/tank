@@ -8,6 +8,7 @@ public class TankMovement : MonoBehaviour {
     public AudioClip m_EngineIdling;
     public AudioClip m_EngineDriving;
     public float m_PitchRange = 0.2f;
+    public MovementType movementType = MovementType.Player;
 
     private string m_MovementAxisName;
     private string m_TurnAxisName;
@@ -74,6 +75,7 @@ public class TankMovement : MonoBehaviour {
 
 
     private void FixedUpdate() {
+        if (movementType != MovementType.Player) return;
         // Move and turn the tank.
         Move();
     }

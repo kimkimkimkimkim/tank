@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour {
     private WaitForSeconds m_EndWait;
     private TankManager m_RoundWinner;
     private TankManager m_GameWinner;
+    private GameObject playerTank;
 
     private void Start() {
         m_StartWait = new WaitForSeconds(m_StartDelay);
@@ -32,9 +33,11 @@ public class GameManager : MonoBehaviour {
 
     private void SpawnAllTanks() {
         for (int i = 0; i < m_Tanks.Length; i++) {
-            m_Tanks[i].m_Instance =
-                Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
+            GameObject tank = Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
+            m_Tanks[i].m_Instance = tank;
+            if (i == 0) playerTank = tank;
             m_Tanks[i].m_PlayerNumber = i + 1;
+            m_Tanks[i].playerTank = playerTank;
             m_Tanks[i].Setup();
         }
     }
