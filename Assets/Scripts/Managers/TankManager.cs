@@ -44,6 +44,7 @@ public class TankManager {
             m_Movement.movementType = MovementType.CPU1;
             m_Shooting.movementType = MovementType.CPU1;
             m_Instance.GetComponent<Cpu1Controller>().TargetObject = playerTank;
+            m_Shooting.playerTank = playerTank;
         }
 
         m_ColoredPlayerText = "<color=#" + ColorUtility.ToHtmlStringRGB(m_PlayerColor) + ">PLAYER " + m_PlayerNumber + "</color>";

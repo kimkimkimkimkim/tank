@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class TankShooting : MonoBehaviour {
     public int m_PlayerNumber = 1;              // Used to identify the different players.
@@ -13,15 +14,18 @@ public class TankShooting : MonoBehaviour {
     public float m_MaxLaunchForce = 30f;        // The force given to the shell if the fire button is held for the max charge time.
     public float m_MaxChargeTime = 0.75f;       // How long the shell can charge for before it is fired at max force.
     public float m_LaunchForce = 20f;
+    public float range = 10f;
     public MovementType movementType = MovementType.Player;
+    [HideInInspector] public GameObject playerTank; //プレイヤーのタンクオブジェクト
 
 
     private string m_FireButton;                // The input axis that is used for launching shells.
     private float m_CurrentLaunchForce;         // The force that will be given to the shell when the fire button is released.
     private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
-    private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
+    private bool m_Fired = false;                       // Whether or not the shell has been launched with this button press.
     private FireJoystick m_Joystick;
     private Rigidbody m_Rigidbody;
+    private float distance;
 
     private void Awake() {
         m_Rigidbody = GetComponent<Rigidbody>();
@@ -46,10 +50,18 @@ public class TankShooting : MonoBehaviour {
 
 
     private void Update() {
-        if (movementType != MovementType.Player) return;
-        if (m_Joystick.isFire) {
-            m_Joystick.isFire = false;
-            Fire();
+        if (movementType == MovementType.Player) {
+            //Player
+            if (m_Joystick.isFire) {
+                m_Joystick.isFire = false;
+                Fire();
+            }
+        } else {
+            //CPU
+            distance = (m_Rigidbody.position - playerTank.transform.position).magnitude;
+            if (distance <= range) {
+                TurnFire();
+            }
         }
     }
 
@@ -69,6 +81,9 @@ public class TankShooting : MonoBehaviour {
 
 
     private void Fire() {
+        if (m_Fired) return;
+        m_Fired = true;
+        StartCoroutine(CanFire());
         // Create an instance of the shell and store a reference to it's rigidbody.
         Rigidbody shellInstance =
             Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
@@ -80,5 +95,16 @@ public class TankShooting : MonoBehaviour {
         m_ShootingAudio.clip = m_FireClip;
         m_ShootingAudio.Play();
 
+    }
+
+    IEnumerator CanFire() {
+        yield return new WaitForSeconds(1f);
+        m_Fired = false;
+    }
+
+    //ターゲットの方向を向いて攻撃
+    private void TurnFire() {
+        m_Rigidbody.transform.LookAt(playerTank.transform);
+        Fire();
     }
 }
